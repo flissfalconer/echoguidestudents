@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoGuide Free — Study Beyond English</title>
+  <meta name="description" content="EchoGuide Free: a script that listens to you, so you never lose your place. The free student version from Study Beyond English." />
+
+  <!-- Fonts: Lexend (Google Fonts) and OpenDyslexic (CDN) for the dyslexia-friendly toggle -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/opendyslexic">
+
+  <style>
+    /* ===========================================================
+       EchoGuide Free — SBE brand styling
+       Colours: SBE Purple #4B2E83, Deep Mauve #6E4A6E,
+                Blush Pink #F7DDE2, Cream #FFF7F0,
+                Pastel Lilac #D9C7F1, Muted Gold #D8B878,
+                Charcoal Grey #4A4A4A
+       =========================================================== */
+
+    :root {
+      --sbe-purple: #4B2E83;
+      --sbe-mauve: #6E4A6E;
+      --sbe-blush: #F7DDE2;
+      --sbe-cream: #FFF7F0;
+      --sbe-lilac: #D9C7F1;
+      --sbe-gold: #D8B878;
+      --sbe-charcoal: #4A4A4A;
+      --sbe-rose: #E8B7C8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: "Aptos", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+      background: var(--sbe-cream);
+      color: var(--sbe-charcoal);
+      line-height: 1.5;
+    }
+
+    h1, h2, h3 {
+      font-family: "Century Gothic", "Aptos", system-ui, sans-serif;
+      font-weight: 700;
+      color: var(--sbe-purple);
+      margin: 0 0 0.5rem 0;
+    }
+
+    h1 { font-size: 2rem; letter-spacing: 0.02em; }
+    h2 { font-size: 1.15rem; }
+
+    header {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      background: linear-gradient(135deg, var(--sbe-lilac) 0%, var(--sbe-blush) 100%);
+      border-bottom: 3px solid var(--sbe-purple);
+    }
+
+    header p {
+      margin: 0.25rem 0 0 0;
+      color: var(--sbe-mauve);
+      font-style: italic;
+    }
+
+    .badge-free {
+      display: inline-block;
+      background: var(--sbe-purple);
+      color: var(--sbe-cream);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    section {
+      margin-bottom: 1.5rem;
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--sbe-lilac);
+      box-shadow: 0 1px 3px rgba(75, 46, 131, 0.05);
+    }
+
+    label {
+      display: inline-block;
+      margin-right: 0.4rem;
+      font-weight: 600;
+      color: var(--sbe-purple);
+    }
+
+    .settings-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .settings-row > div {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    textarea, select, button {
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    select {
+      padding: 0.45rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid var(--sbe-lilac);
+      background: #fff;
+      color: var(--sbe-charcoal);
+      cursor: pointer;
+    }
+
+    #script-input {
+      width: 100%;
+      min-height: 150px;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--sbe-lilac);
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      margin-right: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: var(--sbe-lilac);
+      color: var(--sbe-purple);
+      font-weight: 600;
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--sbe-blush);
+    }
+
+    button:active:not(:disabled) { transform: translateY(1px); }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #start-btn {
+      background: var(--sbe-purple);
+      color: var(--sbe-cream);
+    }
+
+    #start-btn:hover:not(:disabled) { background: var(--sbe-mauve); }
+
+    #stop-btn {
+      background: var(--sbe-rose);
+      color: var(--sbe-purple);
+    }
+
+    #script-display {
+      padding: 1rem;
+      min-height: 140px;
+      max-height: 360px;
+      border-radius: 8px;
+      border: 1px solid var(--sbe-lilac);
+      background: #fff;
+      line-height: 1.9;
+      font-size: 1.15rem;
+      overflow-y: auto;
+      color: var(--sbe-charcoal);
+    }
+
+    .word { padding: 0 0.15rem; }
+
+    .word.current {
+      background: var(--sbe-gold);
+      color: #2a1a4a;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .word.past { color: #b9b2c4; }
+
+    #status {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--sbe-mauve);
+      min-height: 1.3em;
+    }
+
+    /* ---------- DYSLEXIA-FRIENDLY MODE ---------- */
+    body.dyslexia-on {
+      background: #FFF8EE;
+    }
+
+    body.dyslexia-on #script-display,
+    body.dyslexia-on #script-input {
+      font-family: "OpenDyslexic", "Lexend", "Aptos", system-ui, sans-serif;
+      letter-spacing: 0.04em;
+      word-spacing: 0.1em;
+      line-height: 2.1;
+      background: #FFF8EE;
+    }
+
+    body.dyslexia-on #script-display {
+      font-size: 1.3rem;
+    }
+
+    /* ---------- HELP OVERLAY ---------- */
+    #help-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(75, 46, 131, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    #help-box {
+      background: var(--sbe-cream);
+      padding: 1.75rem;
+      border-radius: 14px;
+      max-width: 480px;
+      width: 100%;
+      border-top: 4px solid var(--sbe-purple);
+    }
+
+    #help-box h2 { margin-top: 0; }
+
+    #help-box p { color: var(--sbe-charcoal); }
+
+    .hidden { display: none !important; }
+
+    footer {
+      text-align: center;
+      padding: 1.25rem 1rem 2rem;
+      font-size: 0.85rem;
+      color: var(--sbe-mauve);
+    }
+
+    footer a {
+      color: var(--sbe-purple);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 540px) {
+      h1 { font-size: 1.5rem; }
+      main { padding: 0.75rem; }
+      section { padding: 1rem; }
+      button { width: 100%; margin-right: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="badge-free">Free Student Version</span>
+    <h1>EchoGuide</h1>
+    <p>A script that listens to you, so you never lose your place.</p>
+  </header>
+
+  <main>
+
+    <!-- SETTINGS PANEL -->
+    <section id="settings-section" aria-label="Settings">
+      <h2>Settings</h2>
+      <div class="settings-row">
+        <div>
+          <label for="dyslexia-toggle">Dyslexia-friendly mode:</label>
+          <select id="dyslexia-toggle">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+          </select>
+        </div>
+        <div>
+          <label for="lang-select">Voice language:</label>
+          <select id="lang-select">
+            <option value="en-GB">English (UK)</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-AU">English (Australia)</option>
+            <option value="en-IE">English (Ireland)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAVED SCRIPTS -->
+    <section id="saved-section" aria-label="Saved scripts">
+      <h2>Your saved scripts</h2>
+      <div class="settings-row">
+        <div>
+          <label for="saved-scripts">Open:</label>
+          <select id="saved-scripts">
+            <option value="">Select a saved script…</option>
+          </select>
+        </div>
+        <button id="delete-script" type="button">Delete selected</button>
+      </div>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--sbe-mauve);">
+        Scripts are saved only in this browser. No accounts, no uploads.
+      </p>
+    </section>
+
+    <!-- INPUT -->
+    <section id="input-section">
+      <h2>1. Paste your script</h2>
+      <textarea id="script-input" placeholder="Paste or type your script here. A monologue, a speech, a poem — anything you'd like to rehearse."></textarea>
+      <div>
+        <button id="load-script" type="button">Load script</button>
+        <button id="save-script" type="button">Save script</button>
+      </div>
+    </section>
+
+    <!-- DISPLAY -->
+    <section id="display-section" aria-label="Script display">
+      <h2>2. Script view</h2>
+      <div id="script-display" role="region" aria-live="polite">
+        Your loaded script will appear here. The next word lights up as you speak.
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section id="controls-section">
+      <h2>3. Speak</h2>
+      <button id="start-btn" type="button">Start EchoGuide</button>
+      <button id="stop-btn" type="button" disabled>Stop</button>
+      <button id="restart-btn" type="button">Restart from top</button>
+      <button id="help-btn" type="button">About &amp; privacy</button>
+      <p id="status" aria-live="polite">Waiting to start…</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>EchoGuide Free is a Study Beyond English project.<br>
+      For schools wanting full pacing feedback, analytics and offline use, see
+      <a href="https://www.studybeyondenglish.com" target="_blank" rel="noopener">EchoGuide Pro</a>.</p>
+  </footer>
+
+  <!-- HELP OVERLAY -->
+  <div id="help-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div id="help-box">
+      <h2 id="help-title">About EchoGuide Free</h2>
+      <p>EchoGuide listens to you read aloud and highlights the next word in your script. It is designed so you can rehearse with your own words on stage; no loose pages, no AI chat.</p>
+      <p><strong>Privacy:</strong> EchoGuide does not record or store your audio. Your scripts are saved only in this browser. Nothing is sent to a server.</p>
+      <p><strong>Browser:</strong> Speech recognition works best in Chrome or Edge on a laptop or Android device. Safari has limited support.</p>
+      <p style="font-size: 0.85rem; color: var(--sbe-mauve);">EchoGuide Free is brought to you by Study Beyond English.</p>
+      <button id="close-help" type="button">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================================
+    // EchoGuide Free — Levels 1+2 combined, brand-aligned, single-file build
+    // =====================================================================
+
+    // ----- STATE -----
+    let words = [];
+    let currentIndex = 0;
+    let recognition = null;
+    let listening = false;
+    const STORAGE_PREFIX = "echoguide_free_script_";
+
+    // ----- DOM REFERENCES -----
+    const scriptInput       = document.getElementById("script-input");
+    const loadScriptBtn     = document.getElementById("load-script");
+    const saveScriptBtn     = document.getElementById("save-script");
+    const deleteScriptBtn   = document.getElementById("delete-script");
+    const savedScriptsSelect= document.getElementById("saved-scripts");
+
+    const scriptDisplay     = document.getElementById("script-display");
+    const startBtn          = document.getElementById("start-btn");
+    const stopBtn           = document.getElementById("stop-btn");
+    const restartBtn        = document.getElementById("restart-btn");
+    const statusEl          = document.getElementById("status");
+
+    const dyslexiaToggle    = document.getElementById("dyslexia-toggle");
+    const langSelect        = document.getElementById("lang-select");
+
+    const helpBtn           = document.getElementById("help-btn");
+    const helpOverlay       = document.getElementById("help-overlay");
+    const closeHelp         = document.getElementById("close-help");
+
+    // ----- LOAD SCRIPT -----
+    loadScriptBtn.addEventListener("click", () => {
+      const text = scriptInput.value.trim();
+      if (!text) {
+        statusEl.textContent = "Please paste or type a script first.";
+        return;
+      }
+      words = text.split(/\s+/);
+      currentIndex = 0;
+      renderScript();
+      statusEl.textContent = "Script loaded. When you're ready, press Start.";
+    });
+
+    // ----- RENDER SCRIPT -----
+    function renderScript() {
+      scriptDisplay.innerHTML = "";
+      words.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.textContent = word + " ";
+        span.classList.add("word");
+        if (index === currentIndex) span.classList.add("current");
+        scriptDisplay.appendChild(span);
+      });
+    }
+
+    // ----- SPEECH RECOGNITION -----
+    function initRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SR) {
+        statusEl.textContent = "Speech recognition is not supported in this browser. Try Chrome or Edge on desktop.";
+        startBtn.disabled = true;
+        return false;
+      }
+
+      recognition = new SR();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = langSelect.value || "en-GB";
+
+      recognition.addEventListener("result", handleResult);
+
+      recognition.addEventListener("end", () => {
+        listening = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        if (currentIndex >= words.length && words.length > 0) {
+          statusEl.textContent = "You reached the end of your script. Well done.";
+        } else {
+          statusEl.textContent = "Speech recognition stopped.";
+        }
+      });
+
+      recognition.addEventListener("error", (e) => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          statusEl.textContent = "Microphone access was blocked. Please allow it in your browser to use EchoGuide.";
+        } else if (e.error === "no-speech") {
+          // gentle — don't break flow
+        } else {
+          statusEl.textContent = "Speech recognition error: " + e.error;
+        }
+      });
+
+      return true;
+    }
+
+    function handleResult(event) {
+      if (!words.length) return;
+
+      const transcript = Array.from(event.results)
+        .map(r => r[0].transcript)
+        .join(" ")
+        .toLowerCase()
+        .trim();
+
+      const spokenWords = transcript.split(/\s+/);
+
+      while (
+        currentIndex < words.length &&
+        spokenWords.includes(words[currentIndex].toLowerCase().replace(/[^\w']/g, ""))
+      ) {
+        const spans = scriptDisplay.querySelectorAll(".word");
+        spans[currentIndex].classList.remove("current");
+        spans[currentIndex].classList.add("past");
+
+        currentIndex++;
+
+        if (currentIndex < words.length) {
+          spans[currentIndex].classList.add("current");
+          ensureVisible(spans[currentIndex]);
+        } else {
+          statusEl.textContent = "You reached the end of your script. Well done.";
+          recognition.stop();
+          break;
+        }
+      }
+    }
+
+    function ensureVisible(element) {
+      const rect = element.getBoundingClientRect();
+      const parentRect = scriptDisplay.getBoundingClientRect();
+
+      if (rect.bottom > parentRect.bottom) {
+        scriptDisplay.scrollTop += rect.bottom - parentRect.bottom + 10;
+      } else if (rect.top < parentRect.top) {
+        scriptDisplay.scrollTop -= parentRect.top - rect.top + 10;
+      }
+    }
+
+    // ----- START / STOP / RESTART -----
+    startBtn.addEventListener("click", () => {
+      if (!words.length) {
+        statusEl.textContent = "Please load a script before starting.";
+        return;
+      }
+      if (!recognition) {
+        if (!initRecognition()) return;
+      } else {
+        recognition.lang = langSelect.value || "en-GB";
+      }
+
+      currentIndex = 0;
+      renderScript();
+
+      try {
+        recognition.start();
+      } catch (err) {
+        statusEl.textContent = "Could not start listening. Please try again.";
+        return;
+      }
+
+      listening = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      statusEl.textContent = "Listening… speak your script when you're ready.";
+    });
+
+    stopBtn.addEventListener("click", () => {
+      if (recognition && listening) {
+        recognition.stop();
+        statusEl.textContent = "Stopping…";
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      if (recognition && listening) recognition.stop();
+      currentIndex = 0;
+      renderScript();
+      statusEl.textContent = "Back to the top. Press Start when you're ready.";
+    });
+
+    // ----- DYSLEXIA-FRIENDLY TOGGLE -----
+    dyslexiaToggle.addEventListener("change", () => {
+      if (dyslexiaToggle.value === "on") {
+        document.body.classList.add("dyslexia-on");
+      } else {
+        document.body.classList.remove("dyslexia-on");
+      }
+      try {
+        localStorage.setItem("echoguide_free_dyslexia", dyslexiaToggle.value);
+      } catch (_) {}
+    });
+
+    // ----- LANGUAGE PERSIST -----
+    langSelect.addEventListener("change", () => {
+      try {
+        localStorage.setItem("echoguide_free_lang", langSelect.value);
+      } catch (_) {}
+      if (recognition) recognition.lang = langSelect.value;
+    });
+
+    // ----- SAVED SCRIPTS (namespaced localStorage) -----
+    function loadSavedScripts() {
+      savedScriptsSelect.innerHTML = '<option value="">Select a saved script…</option>';
+      try {
+        const keys = Object.keys(localStorage)
+          .filter(k => k.startsWith(STORAGE_PREFIX))
+          .sort();
+        keys.forEach(key => {
+          const option = document.createElement("option");
+          option.value = key;
+          option.textContent = key.replace(STORAGE_PREFIX, "");
+          savedScriptsSelect.appendChild(option);
+        });
+      } catch (_) {
+        // localStorage may be blocked in some embedded contexts
+      }
+    }
+
+    saveScriptBtn.addEventListener("click", () => {
+      const text = scriptInput.value.trim();
+      if (!text) {
+        statusEl.textContent = "Nothing to save yet — paste a script first.";
+        return;
+      }
+      const name = prompt("Name this script:");
+      if (!name) return;
+      try {
+        localStorage.setItem(STORAGE_PREFIX + name.trim(), text);
+        loadSavedScripts();
+        statusEl.textContent = "Script saved.";
+      } catch (_) {
+        statusEl.textContent = "Could not save (browser storage blocked).";
+      }
+    });
+
+    savedScriptsSelect.addEventListener("change", () => {
+      const key = savedScriptsSelect.value;
+      if (!key) return;
+      try {
+        scriptInput.value = localStorage.getItem(key) || "";
+        statusEl.textContent = "Loaded saved script. Press Load script to use it.";
+      } catch (_) {}
+    });
+
+    deleteScriptBtn.addEventListener("click", () => {
+      const key = savedScriptsSelect.value;
+      if (!key) {
+        statusEl.textContent = "Select a saved script first.";
+        return;
+      }
+      if (!confirm("Delete this saved script? This cannot be undone.")) return;
+      try {
+        localStorage.removeItem(key);
+        loadSavedScripts();
+        statusEl.textContent = "Script deleted.";
+      } catch (_) {}
+    });
+
+    // ----- HELP OVERLAY -----
+    helpBtn.addEventListener("click", () => helpOverlay.classList.remove("hidden"));
+    closeHelp.addEventListener("click", () => helpOverlay.classList.add("hidden"));
+    helpOverlay.addEventListener("click", (e) => {
+      if (e.target === helpOverlay) helpOverlay.classList.add("hidden");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") helpOverlay.classList.add("hidden");
+    });
+
+    // ----- RESTORE SAVED SETTINGS -----
+    function restoreSettings() {
+      try {
+        const dys = localStorage.getItem("echoguide_free_dyslexia");
+        if (dys === "on") {
+          dyslexiaToggle.value = "on";
+          document.body.classList.add("dyslexia-on");
+        }
+        const lang = localStorage.getItem("echoguide_free_lang");
+        if (lang) langSelect.value = lang;
+      } catch (_) {}
+    }
+
+    // ----- INIT -----
+    restoreSettings();
+    loadSavedScripts();
+  </script>
+
+</body>
+</html>
